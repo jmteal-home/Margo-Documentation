@@ -1,116 +1,98 @@
 interface C4BoxProps {
   title: string;
-  type?: string;
+  subtitle?: string;
   description?: string;
   technology?: string;
-  color?: "blue" | "gray" | "green" | "orange" | "purple" | "teal" | "red";
-  external?: boolean;
-  size?: "sm" | "md" | "lg";
-  className?: string;
+  variant?: "person" | "system" | "container" | "component" | "database" | "external";
+  color?: "blue" | "slate" | "emerald" | "orange" | "violet" | "teal" | "rose" | "amber";
+  width?: number;
 }
 
-const colorMap: Record<
+const colorStyles: Record<
   NonNullable<C4BoxProps["color"]>,
-  { bg: string; border: string; text: string; badge: string }
+  { header: string; border: string; dot: string }
 > = {
-  blue: {
-    bg: "bg-blue-700",
-    border: "border-blue-800",
-    text: "text-white",
-    badge: "bg-blue-600 text-blue-100",
-  },
-  gray: {
-    bg: "bg-gray-100",
-    border: "border-gray-300",
-    text: "text-gray-800",
-    badge: "bg-gray-200 text-gray-600",
-  },
-  green: {
-    bg: "bg-emerald-700",
-    border: "border-emerald-800",
-    text: "text-white",
-    badge: "bg-emerald-600 text-emerald-100",
-  },
-  orange: {
-    bg: "bg-orange-600",
-    border: "border-orange-700",
-    text: "text-white",
-    badge: "bg-orange-500 text-orange-100",
-  },
-  purple: {
-    bg: "bg-purple-700",
-    border: "border-purple-800",
-    text: "text-white",
-    badge: "bg-purple-600 text-purple-100",
-  },
-  teal: {
-    bg: "bg-teal-700",
-    border: "border-teal-800",
-    text: "text-white",
-    badge: "bg-teal-600 text-teal-100",
-  },
-  red: {
-    bg: "bg-red-700",
-    border: "border-red-800",
-    text: "text-white",
-    badge: "bg-red-600 text-red-100",
-  },
+  blue:    { header: "bg-blue-700",    border: "border-blue-700",   dot: "bg-blue-400" },
+  slate:   { header: "bg-slate-600",   border: "border-slate-600",  dot: "bg-slate-400" },
+  emerald: { header: "bg-emerald-700", border: "border-emerald-700",dot: "bg-emerald-400" },
+  orange:  { header: "bg-orange-600",  border: "border-orange-600", dot: "bg-orange-400" },
+  violet:  { header: "bg-violet-700",  border: "border-violet-700", dot: "bg-violet-400" },
+  teal:    { header: "bg-teal-700",    border: "border-teal-700",   dot: "bg-teal-400" },
+  rose:    { header: "bg-rose-700",    border: "border-rose-700",   dot: "bg-rose-400" },
+  amber:   { header: "bg-amber-600",   border: "border-amber-600",  dot: "bg-amber-400" },
+};
+
+const variantIcons: Record<NonNullable<C4BoxProps["variant"]>, string> = {
+  person:    "👤",
+  system:    "⬡",
+  container: "▭",
+  component: "◫",
+  database:  "⛁",
+  external:  "○",
 };
 
 export function C4Box({
   title,
-  type,
+  subtitle,
   description,
   technology,
+  variant = "system",
   color = "blue",
-  external = false,
-  size = "md",
-  className = "",
+  width = 180,
 }: C4BoxProps) {
-  const c = colorMap[color];
-  const sizeClass =
-    size === "sm"
-      ? "w-36 min-h-[90px] p-2"
-      : size === "lg"
-      ? "w-56 min-h-[130px] p-4"
-      : "w-44 min-h-[110px] p-3";
+  const isExternal = variant === "external";
 
-  const baseStyle = external
-    ? "bg-gray-100 border-2 border-dashed border-gray-400 text-gray-700"
-    : `${c.bg} ${c.border} ${c.text} border-2`;
+  if (isExternal) {
+    return (
+      <div
+        className="flex flex-col rounded-lg border-2 border-dashed border-gray-400 bg-gray-50 overflow-hidden shadow-sm"
+        style={{ width: `${width}px` }}
+      >
+        <div className="px-3 pt-3 pb-2 flex flex-col items-center gap-1 flex-1">
+          <span className="text-lg text-gray-400">{variantIcons[variant]}</span>
+          {subtitle && (
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 text-center">
+              {subtitle}
+            </div>
+          )}
+          <div className="font-bold text-sm text-gray-700 text-center leading-snug">{title}</div>
+          {technology && (
+            <div className="text-[10px] text-gray-400 italic text-center">[{technology}]</div>
+          )}
+          {description && (
+            <div className="text-[11px] text-gray-500 text-center leading-snug mt-1">{description}</div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  const c = colorStyles[color];
 
   return (
     <div
-      className={`${sizeClass} ${baseStyle} rounded-lg flex flex-col items-center justify-center text-center shadow-sm ${className}`}
+      className={`flex flex-col rounded-lg border-2 ${c.border} bg-white overflow-hidden shadow-sm`}
+      style={{ width: `${width}px` }}
     >
-      {type && (
-        <div
-          className={`text-xs px-2 py-0.5 rounded mb-1.5 font-medium ${
-            external ? "bg-gray-200 text-gray-500" : c.badge
-          }`}
-        >
-          {type}
-        </div>
-      )}
-      <div className="font-bold text-sm leading-tight">{title}</div>
-      {technology && (
-        <div
-          className={`text-xs mt-1 italic ${
-            external ? "text-gray-500" : "opacity-80"
-          }`}
-        >
-          [{technology}]
-        </div>
-      )}
-      {description && (
-        <div
-          className={`text-xs mt-1.5 leading-snug ${
-            external ? "text-gray-600" : "opacity-90"
-          }`}
-        >
-          {description}
-        </div>
-      )}
+      {/* Colored header band */}
+      <div className={`${c.header} px-3 py-2 flex items-center gap-1.5`}>
+        <span className="text-white text-sm opacity-90">{variantIcons[variant]}</span>
+        {subtitle && (
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-white opacity-90">
+            {subtitle}
+          </span>
+        )}
+      </div>
+      {/* Body */}
+      <div className="px-3 pt-2 pb-3 flex flex-col gap-1 bg-white flex-1">
+        <div className="font-bold text-sm text-gray-900 leading-snug">{title}</div>
+        {technology && (
+          <div className="text-[10px] text-gray-500 italic">[{technology}]</div>
+        )}
+        {description && (
+          <div className="text-[11px] text-gray-600 leading-snug mt-0.5">{description}</div>
+        )}
+      </div>
     </div>
   );
 }
