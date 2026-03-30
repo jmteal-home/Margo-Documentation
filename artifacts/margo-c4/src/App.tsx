@@ -6,6 +6,7 @@ import { C4Level3ComponentWFM } from "./pages/C4Level3ComponentWFM";
 import { C4Level3ComponentDevice } from "./pages/C4Level3ComponentDevice";
 import { C4ApplicationPackage } from "./pages/C4ApplicationPackage";
 import { C4DeploymentFlow } from "./pages/C4DeploymentFlow";
+import { AppDescriptionEditor } from "./pages/AppDescriptionEditor";
 
 export type DiagramId =
   | "level1-context"
@@ -13,7 +14,8 @@ export type DiagramId =
   | "level3-wfm"
   | "level3-device"
   | "application-package"
-  | "deployment-flow";
+  | "deployment-flow"
+  | "app-description-editor";
 
 const diagrams: { id: DiagramId; label: string; description: string; badge?: string }[] = [
   {
@@ -51,6 +53,12 @@ const diagrams: { id: DiagramId; label: string; description: string; badge?: str
     label: "Deployment Flow",
     description: "End-to-end workload deployment sequence",
     badge: "Sequence",
+  },
+  {
+    id: "app-description-editor",
+    label: "App Description Editor",
+    description: "Edit & validate margo.yaml with spec tooltips",
+    badge: "Spec",
   },
 ];
 
@@ -94,6 +102,7 @@ export default function App() {
             {active === "level3-device" && <C4Level3ComponentDevice />}
             {active === "application-package" && <C4ApplicationPackage />}
             {active === "deployment-flow" && <C4DeploymentFlow />}
+            {active === "app-description-editor" && <AppDescriptionEditor />}
           </div>
         </main>
       </div>
