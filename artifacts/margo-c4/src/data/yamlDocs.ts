@@ -28,13 +28,22 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
     description: "Specifies the object type. Must be ApplicationDescription.",
     link: `${BASE}#top-level-attributes`,
   },
+  id: {
+    label: "id",
+    section: "Top-level / DeploymentProfile",
+    type: "string",
+    required: true,
+    description:
+      "At top-level: unique identifier for the application — lowercase letters, numbers, and dashes only (no uppercase, underscores, or periods). Max 200 characters. Also used inside each DeploymentProfile to uniquely identify that profile within the app description's scope.",
+    link: `${BASE}#top-level-attributes`,
+  },
   metadata: {
     label: "metadata",
     section: "Top-level",
     type: "Metadata",
     required: true,
     description:
-      "Metadata element specifying characteristics about the application — including id, name, version, and catalog information.",
+      "Metadata element specifying characteristics about the application — name, version, description, and catalog information. Note: id is now a top-level field, not nested inside metadata.",
     link: `${BASE}#top-level-attributes`,
   },
   deploymentProfiles: {
@@ -43,7 +52,7 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
     type: "[]DeploymentProfile",
     required: true,
     description:
-      "Deployment profiles specifying the types of deployments the application supports. Each profile targets either helm.v3 (Kubernetes) or compose (Docker/Podman).",
+      "Deployment profiles specifying the types of deployments the application supports. Each profile targets either helm (Kubernetes, v3 or v4) or compose (Docker/Podman).",
     link: `${BASE}#top-level-attributes`,
   },
   parameters: {
@@ -52,7 +61,7 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
     type: "map[string][Parameter]",
     required: false,
     description:
-      "Named configurable parameters used when installing or updating the application. Values can be string, integer, double, boolean, or arrays thereof.",
+      "Named configurable parameters as a map where each key is the user-defined parameter name (e.g. mysqlDatabase:, greeting:) and the value is a Parameter object. Values can be string, integer, double, boolean, or arrays thereof.",
     link: `${BASE}#top-level-attributes`,
   },
   configuration: {
@@ -66,15 +75,6 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
   },
 
   // ── Metadata ────────────────────────────────────────────────────────────────
-  id: {
-    label: "id",
-    section: "Metadata",
-    type: "string",
-    required: true,
-    description:
-      "Unique identifier for the application. Must be lowercase letters, numbers, and dashes only — no uppercase, underscores, or periods. Max 200 characters.",
-    link: `${BASE}#metadata-attributes`,
-  },
   name: {
     label: "name",
     section: "Metadata / Component / Section / Setting / Schema",
@@ -185,8 +185,7 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
     section: "ApplicationMetadata / Organization",
     type: "string",
     required: false,
-    description:
-      "URL of the application's or organization's website.",
+    description: "URL of the application's or organization's website.",
     link: `${BASE}#applicationmetadata-attributes`,
   },
   tags: {
@@ -216,7 +215,7 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
     type: "string",
     required: true,
     description:
-      "In DeploymentProfile: must be helm.v3 (Kubernetes) or compose (Docker/Podman). In Peripheral: e.g. gpu, display, camera. In CommunicationInterface: e.g. ethernet, wifi, bluetooth.",
+      "In DeploymentProfile: must be helm (supports Helm v3 and v4 with Chart APIVersion v2) or compose (Docker/Podman). Note: Helm deployments must NOT use Lookup, Hooks, or CRD management. In Peripheral: e.g. gpu, display, camera. In CommunicationInterface: e.g. ethernet, wifi, bluetooth.",
     link: `${BASE}#deploymentprofile-attributes`,
   },
   components: {
@@ -245,7 +244,7 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
     type: "CPU",
     required: false,
     description:
-      "CPU requirements: cores (decimal CPU units, e.g. 1.5) and optionally supported architectures (amd64, x86_64, arm64, arm).",
+      "CPU requirements: cores (decimal CPU units, e.g. 1.5) and optionally supported architectures (amd64, arm64, arm).",
     link: `${BASE}#requiredresources-attributes`,
   },
   memory: {
@@ -300,7 +299,7 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
     section: "CPU",
     type: "[]CpuArchitectureType",
     required: false,
-    description: "Supported CPU architectures (e.g. amd64, x86_64, arm64, arm).",
+    description: "Supported CPU architectures. Valid values: amd64, arm64, arm.",
     link: `${BASE}#cpu-attributes`,
   },
 
@@ -311,12 +310,12 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
     type: "ComponentProperties",
     required: true,
     description:
-      "Deployment properties for the component. For helm.v3: repository (OCI URL) + revision (chart version). For compose: packageLocation (archive URL) + optional keyLocation.",
+      "Deployment properties for the component. For helm: repository (OCI URL) + revision (chart version). For compose: packageLocation (direct path to compose.yaml or .tar.gz) + optional keyLocation.",
     link: `${BASE}#component-attributes`,
   },
   repository: {
     label: "repository",
-    section: "ComponentProperties (helm.v3)",
+    section: "ComponentProperties (helm)",
     type: "string",
     required: true,
     description: "OCI URL of the Helm chart (e.g. oci://registry.example.com/charts/my-app).",
@@ -324,7 +323,7 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
   },
   revision: {
     label: "revision",
-    section: "ComponentProperties (helm.v3)",
+    section: "ComponentProperties (helm)",
     type: "string",
     required: true,
     description: "Full version of the Helm chart to deploy (e.g. 1.0.1).",
@@ -354,7 +353,7 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
     type: "string",
     required: true,
     description:
-      "URL of the Compose archive (.tar.gz) containing the compose.yaml and referenced assets.",
+      "URL of the Compose package. Should be a direct path to the compose.yaml or compose file archived in tar.gz.",
     link: `${BASE}#componentproperties-attributes`,
   },
   keyLocation: {
@@ -392,7 +391,7 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
     type: "string",
     required: true,
     description:
-      "For helm.v3: dot-notation path into values.yaml (same as helm --set). For compose: name of the environment variable to set (ENV.VAR_NAME).",
+      "For helm: dot-notation path into values.yaml (same as helm --set). For compose: name of the environment variable to set (e.g. IDP_NAME, POLL_FREQUENCY).",
     link: `${BASE}#target-attributes`,
   },
 
@@ -446,8 +445,7 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
     section: "Schema",
     type: "string",
     required: true,
-    description:
-      "Data type for validation: string, integer, double, or boolean.",
+    description: "Data type for validation: string, integer, double, or boolean.",
     link: `${BASE}#schema-attributes`,
   },
   minLength: {
@@ -528,12 +526,17 @@ export const YAML_FIELD_DOCS: Record<string, FieldDoc> = {
   },
 };
 
-// ── Example YAML strings ─────────────────────────────────────────────────────
+// ── Example YAML strings (updated per spec refresh June 2026) ────────────────
+// Key changes vs prior version:
+//   • id moved from metadata.id → top-level field
+//   • type: helm.v3 → type: helm  (now covers Helm v3 and v4)
+//   • Compose env-var pointers: ENV.IDP_NAME → IDP_NAME  (no ENV. prefix)
+//   • x86_64 removed from CPU architectures (amd64 only in example)
 
 export const EXAMPLE_1 = `apiVersion: margo.org/v1-alpha1
 kind: ApplicationDescription
+id: com-northstartida-hello-world
 metadata:
-  id: com-northstartida-hello-world
   name: Hello World
   description: A basic hello world application
   version: "1.0"
@@ -553,8 +556,8 @@ metadata:
       - name: Northstar Industrial Applications
         site: http://northstar-ida.com
 deploymentProfiles:
-  - type: helm.v3
-    id: com-northstartida-hello-world-helm.v3-a
+  - type: helm
+    id: com-northstartida-hello-world-helm-a
     components:
       - name: hello-world
         properties:
@@ -565,6 +568,7 @@ parameters:
   greeting:
     value: Hello
     targets:
+      # Maps to helm --set global.config.appGreeting="Hello"
       - pointer: global.config.appGreeting
         components: ["hello-world"]
   greetingAddressee:
@@ -593,8 +597,8 @@ configuration:
 
 export const EXAMPLE_2 = `apiVersion: margo.org/v1-alpha1
 kind: ApplicationDescription
+id: com-northstartida-digitron-orchestrator
 metadata:
-  id: com-northstartida-digitron-orchestrator
   name: Digitron orchestrator
   description: The Digitron orchestrator application
   version: 1.2.1
@@ -614,8 +618,8 @@ metadata:
       - name: Northstar Industrial Applications
         site: http://northstar-ida.com
 deploymentProfiles:
-  - type: helm.v3
-    id: com-northstartida-digitron-orchestrator-helm.v3-a
+  - type: helm
+    id: com-northstartida-digitron-orchestrator-helm-a
     description: This allows to install / run the application as a Helm chart deployment.
       The device where this application is installed needs to have a screen and a keyboard.
     components:
@@ -635,7 +639,6 @@ deploymentProfiles:
         cores: 1.5
         architectures:
           - amd64
-          - x86_64
       memory: 1024Mi
       storage: 10Gi
       peripherals:
@@ -654,22 +657,25 @@ deploymentProfiles:
           keyLocation: https://northsitarida.com/digitron/docker/public-key.asc
 parameters:
   idpName:
+    value: "test"
     targets:
+      # Maps to helm --set idp.name="test"
       - pointer: idp.name
         components: ["digitron-orchestrator"]
-      - pointer: ENV.IDP_NAME
+      # Maps to env var: IDP_NAME=test docker compose ...
+      - pointer: IDP_NAME
         components: ["digitron-orchestrator-docker"]
   idpProvider:
     targets:
       - pointer: idp.provider
         components: ["digitron-orchestrator"]
-      - pointer: ENV.IDP_PROVIDER
+      - pointer: IDP_PROVIDER
         components: ["digitron-orchestrator-docker"]
   idpClientId:
     targets:
       - pointer: idp.clientId
         components: ["digitron-orchestrator"]
-      - pointer: ENV.IDP_CLIENT_ID
+      - pointer: IDP_CLIENT_ID
         components: ["digitron-orchestrator-docker"]
   idpUrl:
     targets:
@@ -677,32 +683,32 @@ parameters:
         components: ["digitron-orchestrator"]
       - pointer: idp.providerMetadata
         components: ["digitron-orchestrator"]
-      - pointer: ENV.IDP_URL
+      - pointer: IDP_URL
         components: ["digitron-orchestrator-docker"]
   adminName:
     targets:
       - pointer: administrator.name
         components: ["digitron-orchestrator"]
-      - pointer: ENV.ADMIN_NAME
+      - pointer: ADMIN_NAME
         components: ["digitron-orchestrator-docker"]
   adminPrincipalName:
     targets:
       - pointer: administrator.userPrincipalName
         components: ["digitron-orchestrator"]
-      - pointer: ENV.ADMIN_PRINCIPALNAME
+      - pointer: ADMIN_PRINCIPALNAME
         components: ["digitron-orchestrator-docker"]
   pollFrequency:
     value: 30
     targets:
       - pointer: settings.pollFrequency
         components: ["digitron-orchestrator", "database-services"]
-      - pointer: ENV.POLL_FREQUENCY
+      - pointer: POLL_FREQUENCY
         components: ["digitron-orchestrator-docker"]
   siteId:
     targets:
       - pointer: settings.siteId
         components: ["digitron-orchestrator", "database-services"]
-      - pointer: ENV.SITE_ID
+      - pointer: SITE_ID
         components: ["digitron-orchestrator-docker"]
   cpuLimit:
     value: 1
@@ -840,24 +846,26 @@ export function validateApplicationDescription(yaml: string): ValidationCheck[] 
     error: kind !== 'ApplicationDescription' ? `Expected "ApplicationDescription", got "${kind ?? '(missing)'}"` : undefined,
   });
 
-  const metaId = getLineValue(yaml, 'id');
-  const metaIdValid = !!metaId && /^[a-z0-9-]+$/.test(metaId);
+  // id is now a top-level field (not under metadata)
+  const topLevelId = yaml.match(/(?:^|\n)id\s*:\s*(.+)/);
+  const idValue = topLevelId ? topLevelId[1].trim().replace(/^["']|["']$/g, '') : null;
+  const idValid = !!idValue && /^[a-z0-9-]+$/.test(idValue);
   checks.push({
-    id: 'metadata.id',
-    label: 'metadata.id valid',
-    description: 'Lowercase letters, numbers, and dashes only. Max 200 chars.',
-    valid: metaIdValid,
-    error: !metaId
-      ? 'Missing required field: metadata.id'
-      : !metaIdValid
-      ? `id "${metaId}" contains invalid characters (uppercase/underscore/period not allowed)`
+    id: 'id',
+    label: 'top-level id valid',
+    description: 'Top-level field: lowercase letters, numbers, dashes only. Max 200 chars.',
+    valid: idValid,
+    error: !idValue
+      ? 'Missing required top-level field: id'
+      : !idValid
+      ? `id "${idValue}" contains invalid characters (uppercase/underscore/period not allowed)`
       : undefined,
   });
 
   checks.push({
     id: 'metadata.name',
     label: 'metadata.name present',
-    description: 'Application display name is required',
+    description: 'Application display name is required inside metadata',
     valid: hasKey(yaml, 'name'),
     error: !hasKey(yaml, 'name') ? 'Missing required field: metadata.name' : undefined,
   });
@@ -865,7 +873,7 @@ export function validateApplicationDescription(yaml: string): ValidationCheck[] 
   checks.push({
     id: 'metadata.version',
     label: 'metadata.version present',
-    description: 'Application version string is required',
+    description: 'Application version string is required inside metadata',
     valid: hasKey(yaml, 'version'),
     error: !hasKey(yaml, 'version') ? 'Missing required field: metadata.version' : undefined,
   });
@@ -881,20 +889,43 @@ export function validateApplicationDescription(yaml: string): ValidationCheck[] 
   checks.push({
     id: 'deploymentProfiles',
     label: 'deploymentProfiles present',
-    description: 'At least one deployment profile (helm.v3 or compose) is required',
+    description: 'At least one deployment profile (helm or compose) is required',
     valid: hasKey(yaml, 'deploymentProfiles'),
     error: !hasKey(yaml, 'deploymentProfiles') ? 'Missing required field: deploymentProfiles' : undefined,
   });
 
-  const hasHelm = /type:\s*helm\.v3/.test(yaml);
+  // type: helm (covers helm.v3 too for backwards compatibility check)
+  const hasHelm = /type:\s*helm/.test(yaml);
   const hasCompose = /type:\s*compose/.test(yaml);
   checks.push({
     id: 'profile.type',
     label: 'Valid profile type(s)',
-    description: 'Each deploymentProfile.type must be helm.v3 or compose',
+    description: 'Each deploymentProfile.type must be "helm" or "compose"',
     valid: hasHelm || hasCompose,
     error: !hasHelm && !hasCompose
-      ? 'No valid deployment profile type found (expected helm.v3 or compose)'
+      ? 'No valid deployment profile type found (expected "helm" or "compose")'
+      : undefined,
+  });
+
+  const hasLegacyHelmV3 = /type:\s*helm\.v3/.test(yaml);
+  checks.push({
+    id: 'profile.type.helm-not-v3',
+    label: 'No deprecated helm.v3 type',
+    description: 'type: helm.v3 is deprecated — use type: helm (covers v3 and v4)',
+    valid: !hasLegacyHelmV3,
+    error: hasLegacyHelmV3
+      ? 'Found deprecated "type: helm.v3" — update to "type: helm"'
+      : undefined,
+  });
+
+  const hasLegacyEnvPrefix = /pointer:\s*ENV\./.test(yaml);
+  checks.push({
+    id: 'compose.pointer.no-env-prefix',
+    label: 'No deprecated ENV. pointer prefix',
+    description: 'Compose env-var pointers should use IDP_NAME format, not ENV.IDP_NAME',
+    valid: !hasLegacyEnvPrefix,
+    error: hasLegacyEnvPrefix
+      ? 'Found deprecated "pointer: ENV.*" — remove the ENV. prefix (use IDP_NAME not ENV.IDP_NAME)'
       : undefined,
   });
 
@@ -919,10 +950,10 @@ export function validateApplicationDescription(yaml: string): ValidationCheck[] 
   checks.push({
     id: 'component.location',
     label: 'Component location specified',
-    description: 'helm.v3 requires repository + revision; compose requires packageLocation',
+    description: 'helm requires repository + revision; compose requires packageLocation',
     valid: hasRepo || hasPkg,
     error: !hasRepo && !hasPkg
-      ? 'No component location found (need repository for helm.v3 or packageLocation for compose)'
+      ? 'No component location found (need repository for helm or packageLocation for compose)'
       : undefined,
   });
 

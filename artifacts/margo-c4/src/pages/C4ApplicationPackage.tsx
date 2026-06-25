@@ -60,8 +60,9 @@ export function C4ApplicationPackage() {
                       <div className="border-t border-teal-200 pt-2 mt-2 space-y-0.5 text-gray-700">
                         <p className="font-semibold text-teal-800">Contains:</p>
                         <p>• apiVersion / kind: ApplicationDescription</p>
+                        <p>• id — top-level application identifier</p>
                         <p>• metadata (name, version, author, description)</p>
-                        <p>• deploymentProfiles (helm.v3 and/or compose)</p>
+                        <p>• deploymentProfiles (helm and/or compose)</p>
                         <p>• parameters[] with type, default, constraints</p>
                         <p>• configuration (UI display & grouping rules)</p>
                       </div>
@@ -177,7 +178,7 @@ export function C4ApplicationPackage() {
             </div>
             <div className="bg-gray-50 rounded-md p-3 border border-gray-200 space-y-1">
               <p className="font-bold text-gray-700">spec</p>
-              <p>• <code className="bg-gray-100 px-0.5 rounded">deploymentProfile.type</code> — <em>helm.v3</em> or <em>compose</em></p>
+              <p>• <code className="bg-gray-100 px-0.5 rounded">deploymentProfile.type</code> — <em>helm</em> or <em>compose</em></p>
               <p>• <code className="bg-gray-100 px-0.5 rounded">deploymentProfile.components[]</code> — name + properties (repo, revision, release name…)</p>
               <p>• <code className="bg-gray-100 px-0.5 rounded">parameters[]</code> — name, value, and target component paths</p>
             </div>

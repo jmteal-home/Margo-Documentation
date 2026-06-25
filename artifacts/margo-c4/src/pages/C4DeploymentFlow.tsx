@@ -76,7 +76,7 @@ const steps: Step[] = [
   {
     actor: "Device",
     actorColor: "bg-emerald-100 text-emerald-800 border-emerald-300",
-    action: "State Reconciler installs, updates, or removes workloads to match desired state. Uses Helm v3 for Standalone Cluster or Compose for Standalone Device.",
+    action: "State Reconciler installs, updates, or removes workloads to match desired state. Uses Helm (v3 or v4, Chart APIVersion v2) for Standalone Cluster or Compose for Standalone Device.",
     target: "Workload Runtime",
     protocol: "Kubernetes Helm API  OR  Docker/Podman Compose CLI",
   },

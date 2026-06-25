@@ -7,6 +7,7 @@ import { C4Level3ComponentDevice } from "./pages/C4Level3ComponentDevice";
 import { C4ApplicationPackage } from "./pages/C4ApplicationPackage";
 import { C4DeploymentFlow } from "./pages/C4DeploymentFlow";
 import { AppDescriptionEditor } from "./pages/AppDescriptionEditor";
+import { RevisionHistory } from "./pages/RevisionHistory";
 
 export type DiagramId =
   | "level1-context"
@@ -15,7 +16,8 @@ export type DiagramId =
   | "level3-device"
   | "application-package"
   | "deployment-flow"
-  | "app-description-editor";
+  | "app-description-editor"
+  | "revision-history";
 
 const diagrams: { id: DiagramId; label: string; description: string; badge?: string }[] = [
   {
@@ -60,6 +62,12 @@ const diagrams: { id: DiagramId; label: string; description: string; badge?: str
     description: "Edit & validate margo.yaml with spec tooltips",
     badge: "Spec",
   },
+  {
+    id: "revision-history",
+    label: "Revision History",
+    description: "Spec changes tracked since last content refresh",
+    badge: "Log",
+  },
 ];
 
 export default function App() {
@@ -103,6 +111,7 @@ export default function App() {
             {active === "application-package" && <C4ApplicationPackage />}
             {active === "deployment-flow" && <C4DeploymentFlow />}
             {active === "app-description-editor" && <AppDescriptionEditor />}
+            {active === "revision-history" && <RevisionHistory />}
           </div>
         </main>
       </div>

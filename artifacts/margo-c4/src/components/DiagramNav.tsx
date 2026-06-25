@@ -18,6 +18,7 @@ const badgeColors: Record<string, string> = {
   Concept: "bg-teal-100 text-teal-700",
   Sequence: "bg-violet-100 text-violet-700",
   Spec: "bg-amber-100 text-amber-700",
+  Log: "bg-slate-100 text-slate-700",
 };
 
 export function DiagramNav({ diagrams, active, onSelect }: Props) {
